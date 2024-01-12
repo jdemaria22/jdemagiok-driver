@@ -1,0 +1,76 @@
+;
+; jdemagiok.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Printer 
+ClassGuid={4d36e979-e325-11ce-bfc1-08002be10318} 
+Provider=jdemagiok
+CatalogFile=jdemagiok.cat
+DriverVer= 
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+jdemagiok_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = jdemagiok Installation Disk,,,""
+
+[SourceDisksFiles]
+jdemagiok.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%jdemagiok%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%jdemagiok.DeviceDesc%=jdemagiok_Device, Root\jdemagiok ; TODO: edit hw-id
+
+[jdemagiok_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+jdemagiok.sys
+
+;-------------- Service installation
+[jdemagiok_Device.NT.Services]
+AddService = jdemagiok,%SPSVCINST_ASSOCSERVICE%, jdemagiok_Service_Inst
+
+; -------------- jdemagiok driver install sections
+[jdemagiok_Service_Inst]
+DisplayName    = %jdemagiok.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\jdemagiok.sys
+
+;
+;--- jdemagiok_Device Coinstaller installation ------
+;
+
+[jdemagiok_Device.NT.CoInstallers]
+AddReg=jdemagiok_Device_CoInstaller_AddReg
+CopyFiles=jdemagiok_Device_CoInstaller_CopyFiles
+
+[jdemagiok_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[jdemagiok_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[jdemagiok_Device.NT.Wdf]
+KmdfService =  jdemagiok, jdemagiok_wdfsect
+[jdemagiok_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+jdemagiok="jdemagiok" ; Replace with your manufacturer name
+jdemagiok.DeviceDesc = "jdemagiok Device"
+jdemagiok.SVCDESC = "jdemagiok Service"
