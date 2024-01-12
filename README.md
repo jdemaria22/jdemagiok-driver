@@ -8,7 +8,7 @@
 - [x] Write virtual memory (**mmcopy/mdl**)
 - [x] Kernel driver ready to be manually mapped **tested** (kdmapper/lenovo)
 
-### 1.1 Manually mapping
+### Manually mapping
 
 - [x] use kdmapper
 
