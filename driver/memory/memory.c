@@ -42,47 +42,17 @@ BOOL isguarded(uintptr_t pointer)
 	return result == 0x8000000000 || result == 0x10000000000;
 }
 
-
-uintptr_t readguarded(uintptr_t src, uintptr_t guardedregion)
-{
-	uintptr_t buffer;
-	read_virtual_memory(-1, src, &buffer, sizeof(uintptr_t));
-	uintptr_t val = guardedregion + (*(uintptr_t*)&buffer & 0xFFFFFF);
-	return &val;
-}
-
-uint64_t get_guarded_region() {
-	uint64_t module_vkg = get_kernel_module("vgk.sys");
-	message("module_vkg: %p\n", module_vkg);
-	uint64_t vgk_pool_offset = module_vkg + 0x80CE0;
+NTSTATUS get_guarded_region(PVOID p_buffer) {
+	uintptr_t module_vkg = get_kernel_module("vgk.sys");
+	message("module_vgk: %p\n", module_vkg);
+	uintptr_t vgk_pool_offset = module_vkg + 0x80CE0;
 	message("vgk_pool_offset: %p\n", vgk_pool_offset);
-	uint64_t pool_offset;
-	uint64_t u_world;
-	uint64_t gameInstance;
-	uint64_t localplayer;
-	uint64_t localplayerarray;
-	NTSTATUS status = read_virtual_memory(-1, vgk_pool_offset, &pool_offset, sizeof(uint64_t));
+	NTSTATUS status = read_virtual_memory(-1, (PVOID)vgk_pool_offset, &p_buffer, sizeof(uintptr_t));
 	if (!NT_SUCCESS(status)) {
-		message("get pool failed");
-		return (uint64_t)-1;
+		message("get pool failed %p:", status);
+		return status;
 	}
-	status = read_virtual_memory(-1, pool_offset+0x60, &u_world, sizeof(uint64_t));
-	if (!NT_SUCCESS(status)) {
-		message("get uworld failed");
-		return (uint64_t)-1;
-	}
-	u_world = u_world - 0x10000000000;
-	message("pool_offset: %p\n", pool_offset);
-	message("u_world: %p\n", pool_offset + u_world);
-	status = read_virtual_memory(-1, (pool_offset + u_world) + 0x1A0, &gameInstance, sizeof(uint64_t));
-	message("gameInstance: %p\n", gameInstance);
-	uint64_t merca = readguarded(gameInstance, pool_offset);
-	message("merca de la rica: %p\n", merca);
-	status = read_virtual_memory(-1, gameInstance + 0x40, &localplayerarray, sizeof(uint64_t));
-	status = read_virtual_memory(-1, localplayerarray, &localplayer, sizeof(uint64_t));
-	message("Localplayer: %p\n", localplayer);
-
-	return (uint64_t)pool_offset;
+	return STATUS_SUCCESS;
 }
 
 ULONG64 get_module_imagebase(int pid) {

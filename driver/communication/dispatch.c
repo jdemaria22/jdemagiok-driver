@@ -33,10 +33,18 @@ NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 	else if (control_code == READ_GUARDED_REGION) {
 		message("kernel module request\n");
 		PKERNEL_READ_GUARDED_REGION kernel_guarded_region_request = (PKERNEL_READ_GUARDED_REGION)irp->AssociatedIrp.SystemBuffer;
-		ULONG64 guarded_region = get_guarded_region();
+		NTSTATUS status = get_guarded_region(kernel_guarded_region_request->p_buffer);
+
+		if (!NT_SUCCESS(status)) {
+			irp->IoStatus.Status = status;
+			irp->IoStatus.Information = 0;
+			IoCompleteRequest(irp, IO_NO_INCREMENT);
+			message("Rompio NTSUCCESS %d\n", status);
+			return status;
+		}
 		irp->IoStatus.Status = STATUS_SUCCESS;
-		irp->IoStatus.Information = guarded_region;
-		message("guarded region value %p\n", guarded_region);
+		irp->IoStatus.Information = 0;
+		message("guarded region value %p\n", kernel_guarded_region_request->p_buffer);
 		IoCompleteRequest(irp, IO_NO_INCREMENT);
 		return STATUS_SUCCESS;
 	}

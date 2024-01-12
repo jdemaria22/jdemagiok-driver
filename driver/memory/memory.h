@@ -6,7 +6,7 @@
 
 uint64_t get_kernel_module(const char* module_name);
 
-uint64_t get_guarded_region();
+NTSTATUS get_guarded_region(PVOID p_buffer);
 
 ULONG64 get_module_imagebase(int pid);
 
