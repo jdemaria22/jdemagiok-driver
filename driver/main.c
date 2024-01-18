@@ -3,8 +3,8 @@
 #include "memory/memory.h"
 #include "memory/process.h"
 
-UNICODE_STRING device_name = RTL_CONSTANT_STRING(L"\\Device\\jdemagiok");
-UNICODE_STRING device_link = RTL_CONSTANT_STRING(L"\\DosDevices\\linkjdemagiok");
+UNICODE_STRING device_name = RTL_CONSTANT_STRING(L"\\Device\\jdemagiok81");
+UNICODE_STRING device_link = RTL_CONSTANT_STRING(L"\\DosDevices\\linkjdemagiok81");
 PDEVICE_OBJECT device_object;
 
 NTSTATUS driver_initialize(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_path) {
@@ -28,7 +28,7 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
     UNREFERENCED_PARAMETER(registry_path);
 
     __try {
-        UNICODE_STRING driver_name = RTL_CONSTANT_STRING(L"\\Driver\\jdemagiok");
+        UNICODE_STRING driver_name = RTL_CONSTANT_STRING(L"\\Driver\\jdemagiok81");
 
         return IoCreateDriver(&driver_name, &driver_initialize);
     }
