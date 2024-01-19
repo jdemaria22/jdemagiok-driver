@@ -19,5 +19,3 @@ NTSTATUS read_virtual_memory(HANDLE pid, unsigned __int64 address, void* buffer,
 BOOLEAN is_guarded(uintptr_t pointer);
 
 uintptr_t read_guardered(uintptr_t pointer, uintptr_t guarded_region);
-
-uintptr_t get_guarded_region_value(int pid);

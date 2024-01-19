@@ -34,22 +34,6 @@ uint64_t get_kernel_module(const char* module_name) {
 	return module_base;
 }
 
-uintptr_t get_guarded_region_value(int pid) {
-	uintptr_t module_vkg = get_kernel_module("vgk.sys");
-	message("module_vgk: %p\n", module_vkg);
-	uintptr_t vgk_pool_offset = module_vkg + 0x80CE0;
-	message("vgk_pool_offset: %p\n", vgk_pool_offset);
-	NTSTATUS status;
-	uintptr_t guardedregion;
-	status = read_virtual_memory(pid, vgk_pool_offset, &guardedregion, sizeof(uintptr_t));
-	if (!NT_SUCCESS(status)) {
-		message("get pool failed %p:", status);
-		return status;
-	}
-	message("guarded region value: %p\n", guardedregion);
-	return guardedregion;
-}
-
 NTSTATUS get_guarded_region(int pid, uintptr_t* p_buffer) {
 	uintptr_t module_vkg = get_kernel_module("vgk.sys");
 	message("module_vgk: %p\n", module_vkg);
