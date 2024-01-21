@@ -32,8 +32,8 @@ typedef struct _KERNEL_MODULE_REQUEST {
 
 typedef struct _KERNEL_READ_REQUEST {
 	int src_pid;
-	PVOID src_address;
-	PVOID p_buffer;
+	uintptr_t src_address;
+	uintptr_t* p_buffer;
 	SIZE_T size;
 
 } KERNEL_READ_REQUEST, * PKERNEL_READ_REQUEST;
@@ -41,7 +41,8 @@ typedef struct _KERNEL_READ_REQUEST {
 #define READ_GUARDED_REGION CTL_CODE(FILE_DEVICE_UNKNOWN, 0x444, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
 
 typedef struct _KERNEL_READ_GUARDED_REGION {
-	UNICODE_STRING module_name;
+	int src_pid;
+	uintptr_t* p_buffer;
 } KERNEL_READ_GUARDED_REGION, * PKERNEL_READ_GUARDED_REGION;
 
 #define WRITE_REQUEST CTL_CODE(FILE_DEVICE_UNKNOWN, 0x999, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)

@@ -4,8 +4,8 @@
 
 [Version]
 Signature="$WINDOWS NT$"
-Class=Printer 
-ClassGuid={4d36e979-e325-11ce-bfc1-08002be10318} 
+Class=System 
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318} 
 Provider=jdemagiok
 CatalogFile=jdemagiok.cat
 DriverVer= 

@@ -98,9 +98,8 @@ typedef struct _RTL_PROCESS_MODULE_INFORMATION
 
 
 typedef enum _EPROCESS_OFFSETS {
-
 	ActiveProcessLinks = 0x448,
-	UniqueProcessId = 0x540,
+	UniqueProcessId = 0x440,
 	ImageFileName = 0x5a8
 } EPROCESS_OFFSETS;
 

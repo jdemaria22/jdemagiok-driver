@@ -1,5 +1,5 @@
 #include "dispatch.h"
-
+#include "memory.h"
 
 NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 	UNREFERENCED_PARAMETER(device_object);
@@ -33,10 +33,17 @@ NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 	else if (control_code == READ_GUARDED_REGION) {
 		message("kernel module request\n");
 		PKERNEL_READ_GUARDED_REGION kernel_guarded_region_request = (PKERNEL_READ_GUARDED_REGION)irp->AssociatedIrp.SystemBuffer;
-		ULONG64 guarded_region = get_guarded_region();
+
+		NTSTATUS status = get_guarded_region(kernel_guarded_region_request->src_pid, kernel_guarded_region_request->p_buffer);
+		if (!NT_SUCCESS(status)) {
+			irp->IoStatus.Status = status;
+			irp->IoStatus.Information = 0;
+			IoCompleteRequest(irp, IO_NO_INCREMENT);
+			message("Rompio NTSUCCESS %d\n", status);
+			return status;
+		}
 		irp->IoStatus.Status = STATUS_SUCCESS;
-		irp->IoStatus.Information = guarded_region;
-		message("guarded region value %p\n", guarded_region);
+		irp->IoStatus.Information = sizeof(kernel_guarded_region_request);  // Indicar el tamaño del dato devuelto
 		IoCompleteRequest(irp, IO_NO_INCREMENT);
 		return STATUS_SUCCESS;
 	}
@@ -59,13 +66,10 @@ NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 		message("Read request\n");
 		PKERNEL_READ_REQUEST read_request = (PKERNEL_READ_REQUEST)irp->AssociatedIrp.SystemBuffer;
 
-		message("Src pid %d\n", read_request->src_pid);
-		message("Src address %p\n", read_request->src_address);
-		message("Dst buffer %p\n", read_request->p_buffer);
-		message("Size %d\n", read_request->size);
-
+		//message("Src pid %d\n", read_request->src_pid);
+		//message("Size %d\n", read_request->size);
+		//message("Src address %p\n", read_request->src_address);
 		NTSTATUS status = read_virtual_memory(read_request->src_pid, read_request->src_address, read_request->p_buffer, read_request->size);
-
 		if (!NT_SUCCESS(status)) {
 			irp->IoStatus.Status = status;
 			irp->IoStatus.Information = 0;
@@ -73,14 +77,13 @@ NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 			message("Rompio NTSUCCESS %d\n", status);
 			return status;
 		}
-
+		//message("Trget buffer %p\n", read_request->p_buffer);
 		irp->IoStatus.Status = STATUS_SUCCESS;
 		irp->IoStatus.Information = read_request->size;
 		IoCompleteRequest(irp, IO_NO_INCREMENT);
 		message("NO ROMPIO NTSUCCESS %d\n", STATUS_SUCCESS);
 
 		return STATUS_SUCCESS;
-
 	}
 	else {
 		message("Unknown request\n");
