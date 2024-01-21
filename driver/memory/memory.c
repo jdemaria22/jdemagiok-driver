@@ -36,9 +36,9 @@ uint64_t get_kernel_module(const char* module_name) {
 
 NTSTATUS get_guarded_region(int pid, uintptr_t* p_buffer) {
 	uintptr_t module_vkg = get_kernel_module("vgk.sys");
-	message("module_vgk: %p\n", module_vkg);
+	//message("module_vgk: %p\n", module_vkg);
 	uintptr_t vgk_pool_offset = module_vkg + 0x80CE0;
-	message("vgk_pool_offset: %p\n", vgk_pool_offset);
+	//message("vgk_pool_offset: %p\n", vgk_pool_offset);
 	NTSTATUS status;
 	uintptr_t guardedregion;
 	status = read_virtual_memory(pid, vgk_pool_offset, &guardedregion, sizeof(uintptr_t));
@@ -48,95 +48,95 @@ NTSTATUS get_guarded_region(int pid, uintptr_t* p_buffer) {
 	}
 	message("guarded region value: %p\n", guardedregion);
 	*p_buffer = guardedregion;
-	uintptr_t uwrold;
-	status = read_virtual_memory(pid, guardedregion+0x60, &uwrold, sizeof(uintptr_t));
-	if (!NT_SUCCESS(status)) {
-		message("uwrold failed %p:", status);
-		return status;
-	}
-	if (is_guarded(uwrold)) {
-		read_guardered(uwrold, guardedregion);
-	}	
-	unsigned long long uworld_offset;
-	if (uwrold > 0x10000000000)
-	{
-		uworld_offset = uwrold - 0x10000000000;
-	}
-	else {
-		uworld_offset = uwrold - 0x8000000000;
-	}
-	uwrold = (uintptr_t)guardedregion + uworld_offset;
-	message("uwrold value: %p\n", uwrold);
-	uintptr_t gameinstance;
-	status = read_virtual_memory(pid, uwrold+0x1A0, &gameinstance, sizeof(uintptr_t));
-	if (!NT_SUCCESS(status)) {
-		message("gameinstance failed %p:", status);
-		return status;
-	}
-	if (is_guarded(gameinstance)) {
-		read_guardered(gameinstance, guardedregion);
-	}
-	message("gameinstance value: %p\n", gameinstance);
-	uintptr_t ULocalPlayerArray;
-	status = read_virtual_memory(pid, gameinstance + 0x40, &ULocalPlayerArray, sizeof(uintptr_t));
-	if (!NT_SUCCESS(status)) {
-		message("ULocalPlayerArray failed %p:", status);
-		return status;
-	}
-	if (is_guarded(ULocalPlayerArray)) {
-		read_guardered(ULocalPlayerArray, guardedregion);
-	}
-	message("ULocalPlayerArray value: %p\n", ULocalPlayerArray);
-	uintptr_t ULocalPlayer;
-	status = read_virtual_memory(pid, ULocalPlayerArray, &ULocalPlayer, sizeof(uintptr_t));
-	if (!NT_SUCCESS(status)) {
-		message("ULocalPlayer failed %p:", status);
-		return status;
-	}
-	if (is_guarded(ULocalPlayer)) {
-		ULocalPlayer = read_guardered(ULocalPlayer, guardedregion);
-	}
-	message("ULocalPlayer value: %p\n", ULocalPlayer);
+	//uintptr_t uwrold;
+	//status = read_virtual_memory(pid, guardedregion+0x60, &uwrold, sizeof(uintptr_t));
+	//if (!NT_SUCCESS(status)) {
+	//	message("uwrold failed %p:", status);
+	//	return status;
+	//}
+	//if (is_guarded(uwrold)) {
+	//	read_guardered(uwrold, guardedregion);
+	//}	
+	//unsigned long long uworld_offset;
+	//if (uwrold > 0x10000000000)
+	//{
+	//	uworld_offset = uwrold - 0x10000000000;
+	//}
+	//else {
+	//	uworld_offset = uwrold - 0x8000000000;
+	//}
+	//uwrold = (uintptr_t)guardedregion + uworld_offset;
+	//message("uwrold value: %p\n", uwrold);
+	//uintptr_t gameinstance;
+	//status = read_virtual_memory(pid, uwrold+0x1A0, &gameinstance, sizeof(uintptr_t));
+	//if (!NT_SUCCESS(status)) {
+	//	message("gameinstance failed %p:", status);
+	//	return status;
+	//}
+	//if (is_guarded(gameinstance)) {
+	//	read_guardered(gameinstance, guardedregion);
+	//}
+	//message("gameinstance value: %p\n", gameinstance);
+	//uintptr_t ULocalPlayerArray;
+	//status = read_virtual_memory(pid, gameinstance + 0x40, &ULocalPlayerArray, sizeof(uintptr_t));
+	//if (!NT_SUCCESS(status)) {
+	//	message("ULocalPlayerArray failed %p:", status);
+	//	return status;
+	//}
+	//if (is_guarded(ULocalPlayerArray)) {
+	//	read_guardered(ULocalPlayerArray, guardedregion);
+	//}
+	//message("ULocalPlayerArray value: %p\n", ULocalPlayerArray);
+	//uintptr_t ULocalPlayer;
+	//status = read_virtual_memory(pid, ULocalPlayerArray, &ULocalPlayer, sizeof(uintptr_t));
+	//if (!NT_SUCCESS(status)) {
+	//	message("ULocalPlayer failed %p:", status);
+	//	return status;
+	//}
+	//if (is_guarded(ULocalPlayer)) {
+	//	ULocalPlayer = read_guardered(ULocalPlayer, guardedregion);
+	//}
+	//message("ULocalPlayer value: %p\n", ULocalPlayer);
 
-	uintptr_t APlayerControllerPtr;
-	status = read_virtual_memory(pid, ULocalPlayer + 0x38, &APlayerControllerPtr, sizeof(uintptr_t));
-	if (!NT_SUCCESS(status)) {
-		message("APlayerControllerPtr failed %p:", status);
-		return status;
-	}
-	message("APlayerControllerPtr pre value: %p\n", APlayerControllerPtr);
-	if (is_guarded(APlayerControllerPtr)) {
-		APlayerControllerPtr = read_guardered(APlayerControllerPtr, guardedregion);
-	}
-	message("APlayerControllerPtr final value: %p\n", APlayerControllerPtr);
-	uintptr_t APawn;
-	status = read_virtual_memory(pid, APlayerControllerPtr + 0x468, &APawn, sizeof(uintptr_t));
-	if (!NT_SUCCESS(status)) {
-		message("APawn failed %p:", status);
-		return status;
-	}
-	if (is_guarded(APawn)) {
-		APawn = read_guardered(APawn, guardedregion);
-	}
-	message("APawn value: %p\n", APawn);
-	uintptr_t DamageHandler;
-	status = read_virtual_memory(pid, APawn + 0x9F0, &DamageHandler, sizeof(uintptr_t));
-	if (!NT_SUCCESS(status)) {
-		message("DamageHandler failed %p:", status);
-		return status;
-	}
-	if (is_guarded(DamageHandler)) {
-		DamageHandler = read_guardered(DamageHandler, guardedregion);
-	}
-	message("DamageHandler value: %p\n", DamageHandler);
+	//uintptr_t APlayerControllerPtr;
+	//status = read_virtual_memory(pid, ULocalPlayer + 0x38, &APlayerControllerPtr, sizeof(uintptr_t));
+	//if (!NT_SUCCESS(status)) {
+	//	message("APlayerControllerPtr failed %p:", status);
+	//	return status;
+	//}
+	//message("APlayerControllerPtr pre value: %p\n", APlayerControllerPtr);
+	//if (is_guarded(APlayerControllerPtr)) {
+	//	APlayerControllerPtr = read_guardered(APlayerControllerPtr, guardedregion);
+	//}
+	//message("APlayerControllerPtr final value: %p\n", APlayerControllerPtr);
+	//uintptr_t APawn;
+	//status = read_virtual_memory(pid, APlayerControllerPtr + 0x468, &APawn, sizeof(uintptr_t));
+	//if (!NT_SUCCESS(status)) {
+	//	message("APawn failed %p:", status);
+	//	return status;
+	//}
+	//if (is_guarded(APawn)) {
+	//	APawn = read_guardered(APawn, guardedregion);
+	//}
+	//message("APawn value: %p\n", APawn);
+	//uintptr_t DamageHandler;
+	//status = read_virtual_memory(pid, APawn + 0x9F0, &DamageHandler, sizeof(uintptr_t));
+	//if (!NT_SUCCESS(status)) {
+	//	message("DamageHandler failed %p:", status);
+	//	return status;
+	//}
+	//if (is_guarded(DamageHandler)) {
+	//	DamageHandler = read_guardered(DamageHandler, guardedregion);
+	//}
+	//message("DamageHandler value: %p\n", DamageHandler);
 
-	float Health;
-	status = read_virtual_memory(pid, DamageHandler + 0x1B0, &Health, sizeof(float));
-	if (!NT_SUCCESS(status)) {
-		message("Health failed %p:", status);
-		return status;
-	}
-	message("Health valu %d", (int)Health);
+	//float Health;
+	//status = read_virtual_memory(pid, DamageHandler + 0x1B0, &Health, sizeof(float));
+	//if (!NT_SUCCESS(status)) {
+	//	message("Health failed %p:", status);
+	//	return status;
+	//}
+	//message("Health valu %d", (int)Health);
 	return STATUS_SUCCESS;
 }
 

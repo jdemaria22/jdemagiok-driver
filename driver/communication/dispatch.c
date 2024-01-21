@@ -31,7 +31,7 @@ NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 		return STATUS_SUCCESS;
 	}
 	else if (control_code == READ_GUARDED_REGION) {
-		message("kernel module request\n");
+		//message("kernel module request\n");
 		PKERNEL_READ_GUARDED_REGION kernel_guarded_region_request = (PKERNEL_READ_GUARDED_REGION)irp->AssociatedIrp.SystemBuffer;
 
 		NTSTATUS status = get_guarded_region(kernel_guarded_region_request->src_pid, kernel_guarded_region_request->p_buffer);
@@ -43,7 +43,7 @@ NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 			return status;
 		}
 		irp->IoStatus.Status = STATUS_SUCCESS;
-		irp->IoStatus.Information = sizeof(kernel_guarded_region_request);  // Indicar el tamaño del dato devuelto
+		irp->IoStatus.Information = sizeof(kernel_guarded_region_request);
 		IoCompleteRequest(irp, IO_NO_INCREMENT);
 		return STATUS_SUCCESS;
 	}
@@ -63,7 +63,7 @@ NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 		return STATUS_SUCCESS;
 	}
 	else if (control_code == READ_REQUEST) {
-		message("Read request\n");
+		//message("Read request\n");
 		PKERNEL_READ_REQUEST read_request = (PKERNEL_READ_REQUEST)irp->AssociatedIrp.SystemBuffer;
 
 		//message("Src pid %d\n", read_request->src_pid);
@@ -81,7 +81,7 @@ NTSTATUS on_message(PDEVICE_OBJECT device_object, PIRP irp) {
 		irp->IoStatus.Status = STATUS_SUCCESS;
 		irp->IoStatus.Information = read_request->size;
 		IoCompleteRequest(irp, IO_NO_INCREMENT);
-		message("NO ROMPIO NTSUCCESS %d\n", STATUS_SUCCESS);
+		//message("NO ROMPIO NTSUCCESS %d\n", STATUS_SUCCESS);
 
 		return STATUS_SUCCESS;
 	}
